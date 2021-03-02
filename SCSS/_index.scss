@@ -14,7 +14,7 @@ html {
     //     background-repeat: no-repeat;
 }
 .background_image {
-    background-image: url(image/photo-1519974719765-e6559eac2575.jpeg);
+    background-image: url(../image/photo-1519974719765-e6559eac2575.jpeg);
     background-position: center;
     background-size: cover;
     max-width: 100%;
@@ -79,6 +79,7 @@ html {
         }
     }
 }
+
 .content_index-left-bottom {
     .num {
         font-size: 66px;
@@ -87,7 +88,7 @@ html {
         position: relative;
         &::after {
             content: '';
-            background-image: url(image/index_icon/border.svg);
+            background-image: url(/image/index_icon/border.svg);
             background-repeat: repeat;
             background-size: cover;
             opacity: 0.5;

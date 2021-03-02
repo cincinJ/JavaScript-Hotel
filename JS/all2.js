@@ -16,9 +16,7 @@ const getData = () => {
   axios.get(url + 'room/' + `${roomid}`).then((res) => {
     details = res.data.room[0];
     console.log(res);
-    console.log(details);
     let funfun = res.data.booking;
-    console.log(funfun);
     // 將房間功能物件轉成陣列 -------
     let mm = res.data.room[0].amenities;
     let obj = Object.keys(mm).map(function (_) {
@@ -209,7 +207,7 @@ const datechoose = flatpickr('#dateTest', {
     for (let i = 0; i <= medianDate; i++) {
       let day = new Date(startDate + 8 * 3600 * 1000); // +8*3600*1000是因為台灣時區比ISO快8H,這樣才能解決相差1天的日期
       day.setDate(day.getDate() + i);
-      // 將字串做切割成規定格式 YYYY-MM-
+      // 將字串做切割成規定格式 YYYY-MM-DD
       booking.date.push(day.toISOString().split('T')[0]);
       // 價錢加總,判斷平假日金額不同做總和
       if (day.getDay() == 6 || day.getDay() == 0) {

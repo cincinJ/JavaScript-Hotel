@@ -7,7 +7,7 @@ const getData = () => {
   axios.defaults.headers.common.Authorization = `Bearer ${token}`;
   axios.get(url + 'rooms').then((res) => {
     roomsData = res.data.items;
-    // console.log(res)
+    console.log(res);
     render();
   });
 };
@@ -17,21 +17,27 @@ function render() {
   let str = '';
   roomsData.forEach((i, index) => {
     let roomdetail = `
-              <li><a href="single_room.html?roomid=${i.id}">${i.name}</a></li>
+              <li data-room=${i.id}><a href="single_room.html?roomid=${i.id}">${i.name}</a></li>
               `;
     str += roomdetail;
     imageurll = i.imageUrl;
     let a = index;
-    ccc(a);
   });
   content.innerHTML = str;
 }
 // 試著抓值
-const qa = document.querySelectorAll('.qa');
 const img = document.querySelector('.background_image');
-function changephoto() {
-  img.style['background-image'] = `url(${imageurll})`;
+function changephoto(target) {
+  roomsData.forEach((i) => {
+    if (target.room == i.id) {
+      img.style['background-image'] = `url(${i.imageUrl})`;
+    }
+  });
 }
-function ccc(a) {
-  qa[a].addEventListener('mouseover', changephoto);
+const op = document.querySelectorAll('.op');
+const ul = document.querySelector('.ulaaa');
+ul.addEventListener('mouseover', printback);
+function printback(e) {
+  let target = e.target.dataset;
+  changephoto(target);
 }

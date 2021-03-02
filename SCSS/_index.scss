@@ -14,7 +14,7 @@ html {
     //     background-repeat: no-repeat;
 }
 .background_image {
-    background-image: url(/image/photo-1519974719765-e6559eac2575.jpeg);
+    background-image: url(image/photo-1519974719765-e6559eac2575.jpeg);
     background-position: center;
     background-size: cover;
     max-width: 100%;
@@ -87,7 +87,7 @@ html {
         position: relative;
         &::after {
             content: '';
-            background-image: url(/image/index_icon/border.svg);
+            background-image: url(image/index_icon/border.svg);
             background-repeat: repeat;
             background-size: cover;
             opacity: 0.5;
@@ -142,20 +142,5 @@ html {
 .dtr {
     &:hover {
         color: #ddd !important;
-    }
-}
-
-@keyframes fadein {
-    0% {
-        opacity: 1;
-    }
-    33.333% {
-        opacity: 0.5;
-    }
-    66.666% {
-        opacity: 0.5;
-    }
-    100% {
-        opacity: 1;
     }
 }

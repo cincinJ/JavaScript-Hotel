@@ -1,8 +1,8 @@
 const token = 'nWPYAcCfrSm1CzO5gDZgCgEhmdYoz1tjLjahCsyhxusE2bujYIhkLsRATXzx';
 const url = 'https://challenge.thef2e.com/api/thef2e2019/stage6/';
 const content = document.querySelector('.content_index-right-room-name');
-let roomsData = [];
 
+let roomsData = [];
 const getData = () => {
   axios.defaults.headers.common.Authorization = `Bearer ${token}`;
   axios.get(url + 'rooms').then((res) => {
@@ -24,12 +24,16 @@ function render() {
   });
   content.innerHTML = str;
 }
-// 試著抓值
+// 滑鼠移至房名上更改渲染資料
+const room_num = document.querySelector('.num');
+const room_type = document.getElementById('room_type');
 const img = document.querySelector('.background_image');
 function changephoto(target) {
-  roomsData.forEach((i) => {
+  roomsData.forEach((i, index) => {
     if (target.room == i.id) {
       img.style['background-image'] = `url(${i.imageUrl})`;
+      room_type.textContent = i.name;
+      room_num.textContent = index + 1;
     }
   });
 }

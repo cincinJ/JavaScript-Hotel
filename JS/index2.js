@@ -1,6 +1,6 @@
 const token = 'nWPYAcCfrSm1CzO5gDZgCgEhmdYoz1tjLjahCsyhxusE2bujYIhkLsRATXzx';
 const url = 'https://challenge.thef2e.com/api/thef2e2019/stage6/';
-const content = document.querySelector('.ulaaa');
+const content = document.querySelector('.content_index-right-room-name');
 let roomsData = [];
 
 const getData = () => {
@@ -21,7 +21,6 @@ function render() {
               `;
     str += roomdetail;
     imageurll = i.imageUrl;
-    let a = index;
   });
   content.innerHTML = str;
 }
@@ -34,9 +33,8 @@ function changephoto(target) {
     }
   });
 }
-const op = document.querySelectorAll('.op');
-const ul = document.querySelector('.ulaaa');
-ul.addEventListener('mouseover', printback);
+// 滑鼠移至房名上會更換背景圖片
+content.addEventListener('mouseover', printback);
 function printback(e) {
   let target = e.target.dataset;
   changephoto(target);

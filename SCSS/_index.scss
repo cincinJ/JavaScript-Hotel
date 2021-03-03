@@ -1,17 +1,12 @@
 * {
     border: 1px solid black;
     box-sizing: border-box;
-    // margin: 0 auto;
 }
 body,
 html {
-    // background-image:url(/image/photo-1519974719765-e6559eac2575.jpeg);
-    // background-position: center;
-    // // background-size: cover;
     max-width: 100%;
     height: 100vh;
     margin: 0 auto;
-    //     background-repeat: no-repeat;
 }
 .background_image {
     background-image: url(../../image/photo-1519974719765-e6559eac2575.jpeg);
@@ -60,15 +55,11 @@ html {
                 width: 14px;
                 height: 2px;
                 background-color: #000;
-                // z-index: 1;
                 position: absolute;
                 left: -21px;
                 top: 9px;
                 border-radius: 25%;
             }
-            // &:first-child{
-            //     // padding-top: 37px;
-            // }
             padding-bottom: 37px;
             letter-spacing: 1.5px;
         }
@@ -132,16 +123,5 @@ html {
         bottom: -30px;
         left: 0;
         padding-left: 20px;
-    }
-}
-
-.sr,
-.dsr,
-.dr,
-.ddr,
-.tr,
-.dtr {
-    &:hover {
-        color: #ddd !important;
     }
 }

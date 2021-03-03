@@ -28,6 +28,13 @@ const getData = () => {
     FeaturesIsTrue(obj); //呼叫渲染房間功能函式
 
     // disable日期，將被預約的日期取出放回flatpickr
+    function havedays(haveBookingDetails) {
+      let haveBookingDate = [];
+      haveBookingDetails.forEach((i) => {
+        haveBookingDate.push(i.date);
+      });
+      return haveBookingDate;
+    }
     let haveBookingArray = havedays(haveBookingDetails);
     calendlar(haveBookingArray); // 執行日曆
   });
@@ -99,7 +106,7 @@ const inputPhone = document.getElementById('phone');
 const start = document.querySelector('.start');
 const end = document.querySelector('.end');
 const showTotalPrice = document.querySelector('.price');
-const btn = document.getElementById('btn');
+
 let booking = {
   name: '',
   tel: '',
@@ -108,9 +115,9 @@ let booking = {
 
 function reserve() {
   if (inputName.value === '' || inputPhone.value === '') {
-    console.log('請填寫正確資料');
+    console.log('請填寫姓名&電話');
     swal({
-      title: '請填寫正確資料(`･∀･)b😒',
+      title: '請填寫正確資料(`･∀･)b',
       icon: 'warning',
       dangerMode: true,
     });
@@ -137,11 +144,8 @@ function reserve() {
     });
   }
 }
-
+const btn = document.getElementById('btn');
 btn.addEventListener('click', reserve);
-
-const cancel = document.getElementById('cancel');
-cancel.addEventListener('click', doublecheck);
 
 // 確認是否取消預約提示-套件，確認後執行deleteList函式，刪除遠端預約資料並回傳。
 function doublecheck() {
@@ -150,9 +154,9 @@ function doublecheck() {
     icon: 'warning',
     buttons: ['否', '是'],
     dangerMode: true,
-  }).then((willDelete) => {
+  }).then((confirmDelete) => {
     deleteList();
-    if (willDelete) {
+    if (confirmDelete) {
       swal('您已成功取消預約，感謝您！', {
         icon: 'success',
       });
@@ -161,16 +165,16 @@ function doublecheck() {
     }
   });
 }
-// 清除預約資料
+// 清除全部預約資料
 function deleteList() {
   axios.defaults.headers.common.Authorization = `Bearer ${token}`;
   axios.delete(`${url}rooms`, { data: { success: true } }).then((res) => {
-    console.log(res);
     getData();
   });
 }
+const cancel = document.getElementById('cancel');
+cancel.addEventListener('click', doublecheck);
 
-// calendlar(haveBookingDetails);
 // 日期選擇測試 ,  建立一包物件 / 呼叫？
 function calendlar(haveBookingArray) {
   let datechoose = flatpickr('#dateTest', {
@@ -186,14 +190,11 @@ function calendlar(haveBookingArray) {
       console.log(haveBookingDetails);
       startDate = selectedDates[0].getTime();
       endDate = selectedDates[1].getTime();
-
       start.textContent = dateStr.split('to')[0];
       end.textContent = dateStr.split('to')[1];
-
       let medianDate = (endDate - startDate) / (1000 * 60 * 60 * 24); // 將秒數轉回天數
       booking.date = []; // 防止再次選擇日期時累加,所以要清空
       let totalPrice = 0;
-
       // 跑迴圈列出所有日期,並做價錢加總
       for (let i = 0; i <= medianDate; i++) {
         let day = new Date(startDate + 8 * 3600 * 1000); // +8*3600*1000是因為台灣時區比ISO快8H,這樣才能解決相差1天的日期
@@ -212,12 +213,4 @@ function calendlar(haveBookingArray) {
       showTotalPrice.textContent = totalPrice;
     },
   });
-}
-
-function havedays(haveBookingDetails) {
-  let haveBookingDate = [];
-  haveBookingDetails.forEach((i) => {
-    haveBookingDate.push(i.date);
-  });
-  return haveBookingDate;
 }

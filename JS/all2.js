@@ -11,39 +11,27 @@ let roomid = getUrl.searchParams.get('roomid');
 
 // 取得API資料
 let details = '';
+let haveBookingDetails = [];
 const getData = () => {
   axios.defaults.headers.common.Authorization = `Bearer ${token}`;
   axios.get(url + 'room/' + `${roomid}`).then((res) => {
     details = res.data.room[0];
     console.log(res);
-    let funfun = res.data.booking;
+    haveBookingDetails = res.data.booking;
+    console.log(haveBookingDetails);
     // 將房間功能物件轉成陣列 -------
     let mm = res.data.room[0].amenities;
     let obj = Object.keys(mm).map(function (_) {
       return mm[_];
     });
     FeaturesIsTrue(obj);
-    //---------------------------
     descriptionShort = details.descriptionShort; // 取得房間描述來渲染
     render(details); // 呼叫渲染房間描述
     changeimg(details); // 呼叫渲染header圖片
 
-    function renderaftercheck() {
-      swal({
-        title: '要預約這個時段嗎?',
-        icon: 'warning',
-        buttons: ['否', '是'],
-        dangerMode: true,
-      }).then(() => {
-        funfun.forEach((i) => {
-          if (inputName.value === i.name) {
-            swal(`Name:${i.name}Tel:${i.tel}Date:${i.date}`, {
-              icon: 'success',
-            });
-          }
-        });
-      });
-    }
+    // disable日期，將被預約的日期取出放回flatpickr
+    let lol = havedays(haveBookingDetails);
+    calendlar(lol);
   });
 };
 getData();
@@ -173,51 +161,61 @@ function deleteList() {
   axios.defaults.headers.common.Authorization = `Bearer ${token}`;
   axios.delete(`${url}rooms`, { data: { success: true } }).then((res) => {
     console.log(res);
+    getData();
   });
 }
 
+// calendlar(haveBookingDetails);
 // 日期選擇測試 ,  建立一包物件 / 呼叫？
-const datechoose = flatpickr('#dateTest', {
-  minDate: 'today',
-  maxDate: new Date().fp_incr(180),
-  mode: 'range',
-  inline: true,
-  dateFormat: 'Y-m-d',
-  //   disable: [
-  //     function (date) {
-  //       // return true to disable
-  //       return date.getDay() === 0 || date.getDay() === 6;
-  //     },
-  //   ],
-  startDate: '',
-  endDate: '',
-  onClose: function (selectedDates, dateStr) {
-    // console.log(selectedDates, dateStr);
-    startDate = selectedDates[0].getTime();
-    endDate = selectedDates[1].getTime();
+function calendlar(lol) {
+  let datechoose = flatpickr('#dateTest', {
+    minDate: 'today',
+    maxDate: new Date().fp_incr(180),
+    mode: 'range',
+    inline: true,
+    dateFormat: 'Y-m-d',
+    disable: lol,
+    startDate: '',
+    endDate: '',
+    onClose: function (selectedDates, dateStr) {
+      console.log(haveBookingDetails);
+      // console.log(selectedDates, dateStr);
+      startDate = selectedDates[0].getTime();
+      endDate = selectedDates[1].getTime();
 
-    start.textContent = dateStr.split('to')[0];
-    end.textContent = dateStr.split('to')[1];
+      start.textContent = dateStr.split('to')[0];
+      end.textContent = dateStr.split('to')[1];
 
-    let medianDate = (endDate - startDate) / (1000 * 60 * 60 * 24); // 將秒數轉回天數
-    booking.date = []; // 防止再次選擇日期時累加,所以要清空
-    let totalPrice = 0;
+      let medianDate = (endDate - startDate) / (1000 * 60 * 60 * 24); // 將秒數轉回天數
+      booking.date = []; // 防止再次選擇日期時累加,所以要清空
+      let totalPrice = 0;
 
-    // 跑迴圈列出所有日期,並做價錢加總
-    for (let i = 0; i <= medianDate; i++) {
-      let day = new Date(startDate + 8 * 3600 * 1000); // +8*3600*1000是因為台灣時區比ISO快8H,這樣才能解決相差1天的日期
-      day.setDate(day.getDate() + i);
-      // 將字串做切割成規定格式 YYYY-MM-DD
-      booking.date.push(day.toISOString().split('T')[0]);
-      // 價錢加總,判斷平假日金額不同做總和
-      if (day.getDay() == 6 || day.getDay() == 0) {
-        // console.log('假日');
-        totalPrice += details.holidayPrice;
-      } else {
-        // console.log('平日');
-        totalPrice += details.normalDayPrice;
+      // 跑迴圈列出所有日期,並做價錢加總
+      for (let i = 0; i <= medianDate; i++) {
+        let day = new Date(startDate + 8 * 3600 * 1000); // +8*3600*1000是因為台灣時區比ISO快8H,這樣才能解決相差1天的日期
+        day.setDate(day.getDate() + i);
+        // 將字串做切割成規定格式 YYYY-MM-DD
+        booking.date.push(day.toISOString().split('T')[0]);
+        // 價錢加總,判斷平假日金額不同做總和
+        if (day.getDay() == 6 || day.getDay() == 0) {
+          // console.log('假日');
+          totalPrice += details.holidayPrice;
+        } else {
+          // console.log('平日');
+          totalPrice += details.normalDayPrice;
+        }
       }
-    }
-    showTotalPrice.textContent = totalPrice;
-  },
-});
+      showTotalPrice.textContent = totalPrice;
+    },
+  });
+}
+
+function havedays(haveBookingDetails) {
+  let haveBookingDate = [];
+  console.log(haveBookingDetails);
+  haveBookingDetails.forEach((i) => {
+    haveBookingDate.push(i.date);
+  });
+  console.log(haveBookingDate);
+  return haveBookingDate;
+}

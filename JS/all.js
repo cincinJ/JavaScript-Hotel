@@ -7,49 +7,48 @@ const imgRT = document.querySelector('.info__header--right-top');
 const imgRB = document.querySelector('.info__header--right-button');
 const roomlist = document.querySelector('.room--facilities'); // 選取用來渲染房間功能
 let getUrl = new URL(location.href);
-let roomid = getUrl.searchParams.get('roomid');
+let roomId = getUrl.searchParams.get('roomid');
 
 // 取得API資料
-let details = '';
-let haveBookingDetails = []; // 已預約時間存放空間
-const getData = () => {
+let bookingDate = []; // 已預約時間存放空間
+const RenderPage = () => {
   axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-  axios.get(url + 'room/' + `${roomid}`).then((res) => {
-    console.log(res);
+  axios.get(url + 'room/' + `${roomId}`).then((res) => {
+    let details = '';
     details = res.data.room[0]; // 取得房間詳細
-    haveBookingDetails = res.data.booking; // 已預約時間
-    // 將房間功能物件轉成陣列
-    let mm = res.data.room[0].amenities;
-    let obj = Object.keys(mm).map(function (_) {
-      return mm[_];
-    });
-    changeimg(details); // 呼叫渲染header圖片
-    render(details); // 呼叫渲染房間描述
-    FeaturesIsTrue(obj); //呼叫渲染房間功能函式
-
-    // disable日期，將被預約的日期取出放回flatpickr
-    function havedays(haveBookingDetails) {
-      let haveBookingDate = [];
-      haveBookingDetails.forEach((i) => {
-        haveBookingDate.push(i.date);
-      });
-      return haveBookingDate;
-    }
-    let haveBookingArray = havedays(haveBookingDetails);
-    calendlar(haveBookingArray); // 執行日曆
+    bookingDate = res.data.booking; // 已預約時間
+    RenderHeadImg(details); // 呼叫渲染header圖片
+    RenderRoomDetail(details); // 呼叫渲染房間描述
+    RenderRoomFeatures(details); //呼叫渲染房間功能函式
+    ShowCalendlar(bookingDate); // 呼叫日曆
   });
 };
 
-getData();
-
+// 比對房間功能true||false渲染功能
+function RenderRoomFeatures(details) {
+  const amenitiesIcon = document.querySelectorAll('.icon');
+  let amenities = details.amenities;
+  for (const key in amenities) {
+    if (amenities.hasOwnProperty(key)) {
+      const element = amenities[key];
+      let index = Object.keys(amenities).indexOf(key); // 取物件索引值
+      if (element) {
+        amenitiesIcon[index].style.opacity = '1';
+      } else {
+        amenitiesIcon[index].style.opacity = '0.3';
+      }
+    }
+  }
+}
+RenderPage();
 // 渲染header圖片
-function changeimg(details) {
+function RenderHeadImg(details) {
   imgLeft.style['background-image'] = `url(${details.imageUrl[0]})`;
   imgRT.style['background-image'] = `url(${details.imageUrl[1]})`;
   imgRB.style['background-image'] = `url(${details.imageUrl[2]})`;
 }
 // 渲染房間描述函式
-function render(details) {
+function RenderRoomDetail(details) {
   descriptionShort = details.descriptionShort; // 取得房間描述來渲染
   strName = `
     <h2 class='info--room-name'>${details.name}
@@ -79,41 +78,18 @@ function render(details) {
   name.innerHTML = strName;
   price.innerHTML = strPrice;
 }
-
-// 比對房間功能為true時就取出值並呼叫渲染房間功能函式
-function FeaturesIsTrue(obj) {
-  obj.forEach(function (i, number) {
-    let Features = '';
-    if (i === true) {
-      Features = number;
-    }
-    renderRoomFeatures(Features);
-  });
-}
-// 將所有的img用dom成陣列，把true的值與amenities索引值做比對，符合的話就把icon透明度調成1顯示。
-function renderRoomFeatures(Features) {
-  const amenities = document.querySelectorAll('.icon');
-  amenities.forEach(function (i, index) {
-    if (index === Features) {
-      amenities[index].style.opacity = '1';
-    }
-  });
-}
-
 // 填寫姓名、電話、送出
 const inputName = document.getElementById('name');
 const inputPhone = document.getElementById('phone');
 const start = document.querySelector('.start');
 const end = document.querySelector('.end');
 const showTotalPrice = document.querySelector('.price');
-
 let booking = {
   name: '',
   tel: '',
   date: [],
 };
-
-function reserve() {
+function BookingRoom() {
   if (inputName.value === '' || inputPhone.value === '') {
     console.log('請填寫姓名&電話');
     swal({
@@ -131,31 +107,30 @@ function reserve() {
       dangerMode: true,
     }).then(() => {
       axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-      axios.post(url + 'room/' + `${roomid}`, booking).then((res) => {
+      axios.post(url + 'room/' + `${roomId}`, booking).then((res) => {
         console.log(res);
         inputName.value = '';
         inputPhone.value = '';
         start.textContent = '';
         end.textContent = '';
         showTotalPrice.textContent = '';
-        getData();
+        RenderPage();
         swal('您已預約成功(*´∀`)~♥謝謝！', { icon: 'success' });
       });
     });
   }
 }
-const btn = document.getElementById('btn');
-btn.addEventListener('click', reserve);
-
+const btnBookingRoom = document.getElementById('btn');
+btnBookingRoom.addEventListener('click', BookingRoom);
 // 確認是否取消預約提示-套件，確認後執行deleteList函式，刪除遠端預約資料並回傳。
-function doublecheck() {
+function CheckCancel() {
   swal({
     title: '確定要取消預約嗎?',
     icon: 'warning',
     buttons: ['否', '是'],
     dangerMode: true,
   }).then((confirmDelete) => {
-    deleteList();
+    ClearAllBooking();
     if (confirmDelete) {
       swal('您已成功取消預約，感謝您！', {
         icon: 'success',
@@ -166,28 +141,34 @@ function doublecheck() {
   });
 }
 // 清除全部預約資料
-function deleteList() {
+function ClearAllBooking() {
   axios.defaults.headers.common.Authorization = `Bearer ${token}`;
   axios.delete(`${url}rooms`, { data: { success: true } }).then((res) => {
-    getData();
+    RenderPage();
   });
 }
-const cancel = document.getElementById('cancel');
-cancel.addEventListener('click', doublecheck);
-
+const btnCancel = document.getElementById('cancel');
+btnCancel.addEventListener('click', CheckCancel);
+function havedays(haveBookingDetails) {
+  let haveBookingDate = [];
+  haveBookingDetails.forEach((i) => {
+    haveBookingDate.push(i.date);
+  });
+  return haveBookingDate;
+}
 // 日期選擇測試 ,  建立一包物件 / 呼叫？
-function calendlar(haveBookingArray) {
+function ShowCalendlar(bookingDate) {
+  let disableArray = havedays(bookingDate);
   let datechoose = flatpickr('#dateTest', {
     minDate: 'today',
     maxDate: new Date().fp_incr(180),
     mode: 'range',
     inline: true,
     dateFormat: 'Y-m-d',
-    disable: haveBookingArray,
+    disable: disableArray,
     startDate: '',
     endDate: '',
     onClose: function (selectedDates, dateStr) {
-      console.log(haveBookingDetails);
       startDate = selectedDates[0].getTime();
       endDate = selectedDates[1].getTime();
       start.textContent = dateStr.split('to')[0];

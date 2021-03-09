@@ -8,12 +8,12 @@ const getData = () => {
   axios.get(url + 'rooms').then((res) => {
     roomsData = res.data.items;
     console.log(res);
-    render();
+    RenderRoomDatail();
   });
 };
 getData();
 let imageurll = '';
-function render() {
+function RenderRoomDatail() {
   let str = '';
   roomsData.forEach((i, index) => {
     let roomdetail = `

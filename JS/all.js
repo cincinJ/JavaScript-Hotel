@@ -20,7 +20,7 @@ const RenderPage = () => {
     RenderHeadImg(details); // 呼叫渲染header圖片
     RenderRoomDetail(details); // 呼叫渲染房間描述
     RenderRoomFeatures(details); //呼叫渲染房間功能函式
-    ShowCalendlar(bookingDate); // 呼叫日曆
+    ShowCalendlar(bookingDate, details); // 呼叫日曆
   });
 };
 
@@ -157,7 +157,7 @@ function havedays(haveBookingDetails) {
   return haveBookingDate;
 }
 // 日期選擇測試 ,  建立一包物件 / 呼叫？
-function ShowCalendlar(bookingDate) {
+function ShowCalendlar(bookingDate, details) {
   let disableArray = havedays(bookingDate);
   let datechoose = flatpickr('#dateTest', {
     minDate: 'today',

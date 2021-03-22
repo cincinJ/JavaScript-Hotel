@@ -7,20 +7,18 @@ const getData = () => {
   axios.defaults.headers.common.Authorization = `Bearer ${token}`;
   axios.get(url + 'rooms').then((res) => {
     roomsData = res.data.items;
-    console.log(res);
     RenderRoomDatail();
   });
 };
 getData();
-let imageurll = '';
+
 function RenderRoomDatail() {
   let str = '';
-  roomsData.forEach((i, index) => {
+  roomsData.forEach((i) => {
     let roomdetail = `
               <li data-room=${i.id}><a href="single_room.html?roomid=${i.id}">${i.name}</a></li>
               `;
     str += roomdetail;
-    imageurll = i.imageUrl;
   });
   content.innerHTML = str;
 }
@@ -28,18 +26,20 @@ function RenderRoomDatail() {
 const room_num = document.querySelector('.num');
 const room_type = document.getElementById('room_type');
 const img = document.querySelector('.background_image');
-function changephoto(target) {
-  roomsData.forEach((i, index) => {
-    if (target.room == i.id) {
-      img.style['background-image'] = `url(${i.imageUrl})`;
-      room_type.textContent = i.name;
-      room_num.textContent = index + 1;
-    }
-  });
+function changePhoto(target) {
+  if (target.room) {
+    let selectRoom = roomsData.find((i) => {
+      return target.room == i.id;
+    });
+    let selectRoomNum = roomsData.indexOf(selectRoom);
+    img.style['background-image'] = `url(${selectRoom.imageUrl})`;
+    room_type.textContent = selectRoom.name;
+    room_num.textContent = selectRoomNum + 1;
+  }
 }
 // 滑鼠移至房名上會更換背景圖片
-content.addEventListener('mouseover', printback);
-function printback(e) {
+content.addEventListener('mouseover', printBack);
+function printBack(e) {
   let target = e.target.dataset;
-  changephoto(target);
+  changePhoto(target);
 }

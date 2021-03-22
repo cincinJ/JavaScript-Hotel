@@ -7,14 +7,14 @@ const getData = () => {
   axios.defaults.headers.common.Authorization = `Bearer ${token}`;
   axios.get(url + 'rooms').then((res) => {
     roomsData = res.data.items;
+    console.log(res);
     RenderRoomDatail();
   });
 };
 getData();
-
 function RenderRoomDatail() {
   let str = '';
-  roomsData.forEach((i) => {
+  roomsData.forEach((i, index) => {
     let roomdetail = `
               <li data-room=${i.id}><a href="single_room.html?roomid=${i.id}">${i.name}</a></li>
               `;
@@ -28,12 +28,14 @@ const room_type = document.getElementById('room_type');
 const img = document.querySelector('.background_image');
 function changePhoto(target) {
   if (target.room) {
-    let selectRoom = roomsData.find((i) => {
+    let selectRoomNum;
+    let selectRoom = roomsData.find((i, index) => {
+      selectRoomNum = index;
       return target.room == i.id;
     });
-    let selectRoomNum = roomsData.indexOf(selectRoom);
-    img.style['background-image'] = `url(${selectRoom.imageUrl})`;
-    room_type.textContent = selectRoom.name;
+    const { imageUrl, name } = selectRoom;
+    img.style['background-image'] = `url(${imageUrl})`;
+    room_type.textContent = name;
     room_num.textContent = selectRoomNum + 1;
   }
 }
